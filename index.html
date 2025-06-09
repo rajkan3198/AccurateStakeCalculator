@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stake Bonus Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-6">
+  <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl shadow-2xl">
+    <h1 class="text-2xl font-bold mb-6 text-center">Stake Bonus Calculator</h1>
+
+    <div class="space-y-4">
+      <input id="wager" type="number" placeholder="Wagered Amount ($)" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
+      <input id="loss" type="number" placeholder="Net Win/Loss Amount ($)" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
+      <input id="houseEdge" type="number" value="1" placeholder="House Edge (%)" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
+      <select id="vipLevel" class="w-full p-3 rounded bg-gray-700 text-white">
+        <option>Bronze</option>
+        <option>Silver</option>
+        <option>Gold</option>
+        <option>Plat 1</option>
+        <option>Plat 2</option>
+        <option>Plat 3</option>
+        <option>Plat 4</option>
+        <option>Plat 5</option>
+        <option>Plat 6</option>
+      </select>
+      <button onclick="calculateBonus()" class="w-full bg-blue-600 hover:bg-blue-700 transition p-3 rounded text-white font-bold">Calculate Bonus</button>
+    </div>
+
+    <div id="result" class="mt-6 text-lg font-medium text-center"></div>
+  </div>
+
+  <script>
+    const vipBaseBonus = {
+      "Bronze": 3,
+      "Silver": 4,
+      "Gold": 5,
+      "Plat 1": 10,
+      "Plat 2": 12,
+      "Plat 3": 15,
+      "Plat 4": 20,
+      "Plat 5": 25,
+      "Plat 6": 30
+    };
+
+    function calculateBonus() {
+      const wager = parseFloat(document.getElementById('wager').value) || 0;
+      const profitLoss = parseFloat(document.getElementById('loss').value) || 0;
+      const houseEdge = parseFloat(document.getElementById('houseEdge').value) || 0;
+      const vip = document.getElementById('vipLevel').value;
+
+      const baseBonus = vipBaseBonus[vip] || 0;
+      const wagerBonus = wager * 0.10 * (houseEdge / 100);
+      const outcomeBonus = profitLoss >= 0 ? profitLoss * 0.025 : Math.abs(profitLoss) * 0.05;
+      const totalBonus = baseBonus + wagerBonus + outcomeBonus;
+
+      document.getElementById('result').innerHTML = `
+        <p>🎁 <strong>Total Bonus:</strong> $${totalBonus.toFixed(2)}</p>
+        <p class="text-sm text-gray-400 mt-1">Base: $${baseBonus.toFixed(2)}, Wager Bonus: $${wagerBonus.toFixed(2)}, ${profitLoss >= 0 ? 'Win' : 'Loss'} Bonus: $${outcomeBonus.toFixed(2)}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
