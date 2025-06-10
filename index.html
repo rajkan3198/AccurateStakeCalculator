@@ -2,21 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stake Weekly Bonus Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-6">
-  <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl shadow-2xl">
-    <h1 class="text-2xl font-bold mb-6 text-center">Stake Bonus Calculator</h1>
+<body class="bg-gray-900 text-white min-h-screen p-6">
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">Weekly Bonus Calculator</h1>
 
     <div class="space-y-4">
       <input id="wager" type="number" placeholder="Wagered Amount ($)" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
-      <input id="loss" type="number" placeholder="Net Win/Loss Amount (mention - if loss)($)" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
+
+      <!-- Profit/Loss Toggle -->
+      <div class="flex space-x-4">
+        <button id="profitBtn" class="bg-green-600 px-4 py-2 rounded" onclick="setPLType('profit')">Profit</button>
+        <button id="lossBtn" class="bg-red-600 px-4 py-2 rounded" onclick="setPLType('loss')">Loss</button>
+      </div>
+      <input id="plAmount" type="number" placeholder="Enter Profit or Loss Amount" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
+
       <div>
-  <input id="houseEdge" type="number" value="1" placeholder="House Edge (%)" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
-  <p class="text-sm text-gray-400 mt-1 ml-1">(Average house edge this week(default is 1%) )</p>
-</div>
+        <input id="houseEdge" type="number" value="1" placeholder="House Edge (%)" class="w-full p-3 rounded bg-gray-700 placeholder-gray-400" />
+        <p class="text-sm text-gray-400 mt-1 ml-1">Typical house edge is 1%</p>
+      </div>
 
       <select id="vipLevel" class="w-full p-3 rounded bg-gray-700 text-white">
         <option>Bronze</option>
@@ -29,6 +36,7 @@
         <option>Plat 5</option>
         <option>Plat 6</option>
       </select>
+
       <button onclick="calculateBonus()" class="w-full bg-blue-600 hover:bg-blue-700 transition p-3 rounded text-white font-bold">Calculate Bonus</button>
     </div>
 
@@ -36,6 +44,13 @@
   </div>
 
   <script>
+    let plType = 'profit';
+    function setPLType(type) {
+      plType = type;
+      document.getElementById('profitBtn').classList.toggle('opacity-50', type !== 'profit');
+      document.getElementById('lossBtn').classList.toggle('opacity-50', type !== 'loss');
+    }
+
     const vipBaseBonus = {
       "Bronze": 3,
       "Silver": 4,
@@ -50,7 +65,8 @@
 
     function calculateBonus() {
       const wager = parseFloat(document.getElementById('wager').value) || 0;
-      const profitLoss = parseFloat(document.getElementById('loss').value) || 0;
+      const plValue = parseFloat(document.getElementById('plAmount').value) || 0;
+      const profitLoss = plType === 'profit' ? plValue : -plValue;
       const houseEdge = parseFloat(document.getElementById('houseEdge').value) || 0;
       const vip = document.getElementById('vipLevel').value;
 
@@ -60,7 +76,7 @@
       const totalBonus = baseBonus + wagerBonus + outcomeBonus;
 
       document.getElementById('result').innerHTML = `
-        <p>🎁 <strong>Total Bonus:</strong> $${totalBonus.toFixed(2)}</p>
+        <p>🎁 <strong>Total Weekly Bonus:</strong> $${totalBonus.toFixed(2)}</p>
         <p class="text-sm text-gray-400 mt-1">Base: $${baseBonus.toFixed(2)}, Wager Bonus: $${wagerBonus.toFixed(2)}, ${profitLoss >= 0 ? 'Win' : 'Loss'} Bonus: $${outcomeBonus.toFixed(2)}</p>
       `;
     }
